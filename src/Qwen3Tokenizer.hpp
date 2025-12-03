@@ -10,11 +10,14 @@
 template <ContentType... Types>
 class Qwen3Tokenizer : public BaseTokenizer
 {
-private:
+protected:
     std::shared_ptr<MNN::Transformer::Tokenizer> tokenizer;
     bool add_generation_prompt = true;
     std::string video_pad_token = "<|video_pad|>";
     std::string image_pad_token = "<|image_pad|>";
+
+    std::string img_start_token = "<|vision_start|>";
+    std::string img_end_token = "<|vision_end|>";
 
     static constexpr ContentType support_types[] = {Types...};
 
@@ -42,7 +45,7 @@ public:
         {
             if (!support(content.type))
             {
-                ALOGE("qwen3_tokenizer only support TEXT type");
+                ALOGE("unsupport content type: %d", content.type);
                 return {};
             }
         }
@@ -64,21 +67,21 @@ public:
                          << content.data << "<|im_end|>\n";
                     break;
                 case IMAGE:
-                    text << "<|im_start|>user\n<|vision_start|>";
+                    text << "<|im_start|>user\n" << img_start_token;
                     for (int i = 0; i < content.num_media * content.num_media_tokens; i++)
                     {
                         text << image_pad_token;
                     }
-                    text << "<|vision_end|>";
+                    text << img_end_token;
                     text << content.data << "<|im_end|>\n";
                     break;
                 case VIDEO:
-                    text << "<|im_start|>user\n<|vision_start|>";
+                    text << "<|im_start|>user\n" << img_start_token;
                     for (int i = 0; i < content.num_media * content.num_media_tokens; i++)
                     {
                         text << video_pad_token;
                     }
-                    text << "<|vision_end|>";
+                    text << img_end_token;
                     text << content.data << "<|im_end|>\n";
                     break;
 

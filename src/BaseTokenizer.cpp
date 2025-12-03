@@ -1,8 +1,12 @@
 #include "BaseTokenizer.hpp"
 #include <memory>
-#include "utils/object_register.hpp"
-#include "Qwen3Tokenizer.hpp"
 #include <algorithm>
+
+#include "utils/object_register.hpp"
+
+#include "Qwen3Tokenizer.hpp"
+#include "InternVL3Tokenizer.hpp"
+
 
 std::shared_ptr<BaseTokenizer> create_tokenizer(ModelType type)
 {
