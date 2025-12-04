@@ -69,7 +69,7 @@ public:
     {
         addition_stop_tokens.push_back(token);
     }
-    bool add_stop_tokens(std::string stop_token) override
+    bool add_stop_token(std::string stop_token) override
     {
         auto tokens = tokenizer->encode(stop_token);
         if (tokens.size() != 1)
