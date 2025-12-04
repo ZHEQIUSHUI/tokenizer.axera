@@ -2,16 +2,14 @@
 #include <sstream>
 #include <algorithm>
 
-#include "BaseTokenizer.hpp"
+#include "BaseMixinTokenizer.hpp"
 #include "utils/object_register.hpp"
 #include "utils/sample_log.h"
-#include "tokenizer/tokenizer.hpp"
 
 template <ContentType... Types>
-class Qwen3Tokenizer : public BaseTokenizer
+class Qwen3Tokenizer : public BaseMixinTokenizer<Types...>
 {
 protected:
-    std::shared_ptr<MNN::Transformer::Tokenizer> tokenizer;
     bool add_generation_prompt = true;
     std::string video_pad_token = "<|video_pad|>";
     std::string image_pad_token = "<|image_pad|>";
@@ -19,31 +17,13 @@ protected:
     std::string img_start_token = "<|vision_start|>";
     std::string img_end_token = "<|vision_end|>";
 
-    static constexpr ContentType support_types[] = {Types...};
-
 public:
-    bool load(const std::string tokenizer_path) override
-    {
-        tokenizer.reset(MNN::Transformer::Tokenizer::createTokenizer(tokenizer_path));
-        return tokenizer != nullptr;
-    }
-
-    bool support(ContentType type) override
-    {
-        return std::find(std::begin(support_types), std::end(support_types), type) != std::end(support_types);
-    }
-
-    bool is_stop(int token) override
-    {
-        return tokenizer->is_stop(token);
-    }
-
     std::vector<int> encode(const std::vector<Content> &contents) override
     {
         // check contents type
         for (const auto &content : contents)
         {
-            if (!support(content.type))
+            if (!this->support(content.type))
             {
                 ALOGE("unsupport content type: %d", content.type);
                 return {};
@@ -91,9 +71,9 @@ public:
             }
             else if (content.role == ASSISTANT)
             {
-                if (!think_in_prompt)
+                if (!this->think_in_prompt)
                 {
-                    auto cleaned_data = remove_thinking(content.data);
+                    auto cleaned_data = this->remove_thinking(content.data);
                     text << "<|im_start|>assistant\n"
                          << cleaned_data << "<|im_end|>\n";
                 }
@@ -111,27 +91,7 @@ public:
         }
 
         ALOGD("text: \n%s", text.str().c_str());
-        return tokenizer->encode(text.str());
-    }
-
-    std::vector<int> encode(const std::string &text) override
-    {
-        return tokenizer->encode(text);
-    }
-
-    std::string decode(const std::vector<int> &ids) override
-    {
-        std::stringstream text;
-        for (auto id : ids)
-        {
-            text << tokenizer->decode(id);
-        }
-        return text.str();
-    }
-
-    std::string decode(int id) override
-    {
-        return tokenizer->decode(id);
+        return this->tokenizer->encode(text.str());
     }
 };
 using qwen3vl_tokenizer = Qwen3Tokenizer<TEXT, IMAGE, VIDEO>;

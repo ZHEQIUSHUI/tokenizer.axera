@@ -42,9 +42,7 @@ protected:
     // 是否在上下文中保留thinking内容, 默认为false
     bool think_in_prompt = false;
 
-    // 从文本中移除 end_think_token 之前的内容,并 trim 空格和换行符
-    std::string remove_thinking(const std::string &text, std::string end_think_token = "</think>", bool trim = true);
-
+    
 public:
     virtual bool load(const std::string tokenizer_path) = 0;
     virtual bool support(ContentType type) = 0;
@@ -54,6 +52,10 @@ public:
     }
 
     virtual bool is_stop(int token) = 0;
+    virtual void add_stop_token(int token) = 0;
+    virtual bool add_stop_tokens(std::string stop_token) = 0;
+    virtual void clear_addition_stop_tokens() = 0;
+    virtual std::vector<int> get_stop_tokens() = 0;
 
     virtual std::vector<int> encode(const std::vector<Content> &contents) = 0;
     virtual std::vector<int> encode(const std::string &text) = 0;
