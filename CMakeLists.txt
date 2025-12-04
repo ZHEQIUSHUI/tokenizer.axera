@@ -10,6 +10,9 @@ endif()
 
 project(tokenizer.axera)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 include_directories(include)
 
 add_library(tokenizer src/BaseTokenizer.cpp src/tokenizer/tokenizer.cpp)
