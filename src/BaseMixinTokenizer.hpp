@@ -62,7 +62,7 @@ public:
 
     bool is_stop(int token) override
     {
-        return tokenizer->is_stop(token);
+        return tokenizer->is_stop(token) || std::find(addition_stop_tokens.begin(), addition_stop_tokens.end(), token) != addition_stop_tokens.end();
     }
 
     void add_stop_token(int token) override
