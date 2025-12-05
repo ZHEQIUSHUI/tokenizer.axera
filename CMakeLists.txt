@@ -23,6 +23,7 @@ function(add_test test_name)
 endfunction()
 
 add_test(test_tokenizer)
+add_test(test_num2words_en)
 
 
 install(TARGETS tokenizer DESTINATION lib)

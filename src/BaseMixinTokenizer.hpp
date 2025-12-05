@@ -1,3 +1,4 @@
+#pragma once
 #include "BaseTokenizer.hpp"
 
 #include "tokenizer/tokenizer.hpp"

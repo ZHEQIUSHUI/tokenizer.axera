@@ -10,6 +10,8 @@ enum ModelType
     Qwen3VL,
 
     InternVL3,
+
+    SmolVLM2,
 };
 
 enum RoleType
