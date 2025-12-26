@@ -18,7 +18,7 @@ protected:
     std::string img_end_token = "<|vision_end|>";
 
 public:
-    std::vector<int> encode(const std::vector<Content> &contents) override
+    std::string apply_chat_template(const std::vector<Content> &contents) override
     {
         // check contents type
         for (const auto &content : contents)
@@ -90,8 +90,8 @@ public:
             text << "<|im_start|>assistant\n";
         }
 
-        ALOGD("text: \n%s", text.str().c_str());
-        return this->tokenizer->encode(text.str());
+        // ALOGD("text: \n%s", text.str().c_str());
+        return text.str();
     }
 };
 using qwen3vl_tokenizer = Qwen3Tokenizer<TEXT, IMAGE, VIDEO>;

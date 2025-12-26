@@ -60,7 +60,7 @@ protected:
     }
 
 public:
-    std::vector<int> encode(const std::vector<Content> &contents) override
+    std::string apply_chat_template(const std::vector<Content> &contents) override
     {
         // check contents type
         for (const auto &content : contents)
@@ -131,9 +131,9 @@ public:
         {
             text << "Assistant:";
         }
-
-        ALOGD("text: \n%s", text.str().c_str());
-        return this->tokenizer->encode(text.str());
+        return text.str();
+        // ALOGD("text: \n%s", text.str().c_str());
+        // return this->tokenizer->encode(text.str());
     }
 };
 REGISTER(SmolVLM2, SmolVLM2Tokenizer)

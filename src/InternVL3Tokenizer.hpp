@@ -95,7 +95,7 @@ public:
         img_end_token = "</img>";
     }
 
-    std::vector<int> encode(const std::vector<Content> &contents) override
+    std::string apply_chat_template(const std::vector<Content> &contents) override
     {
         // check contents type
         for (const auto &content : contents)
@@ -163,9 +163,10 @@ public:
         {
             text << "<|im_start|>assistant\n";
         }
-
-        ALOGD("text: \n%s", text.str().c_str());
-        return tokenizer->encode(text.str());
+        
+        return text.str();
+        // ALOGD("text: \n%s", text.str().c_str());
+        // return tokenizer->encode(text.str());
     }
 };
 REGISTER(InternVL3, InternVL3Tokenizer)

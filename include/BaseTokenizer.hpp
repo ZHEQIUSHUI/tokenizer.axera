@@ -59,7 +59,12 @@ public:
     virtual void clear_addition_stop_tokens() = 0;
     virtual std::vector<int> get_stop_tokens() = 0;
 
-    virtual std::vector<int> encode(const std::vector<Content> &contents) = 0;
+    virtual std::vector<int> encode(const std::vector<Content> &contents)
+    {
+        return encode(apply_chat_template(contents));
+    }
+
+    virtual std::string apply_chat_template(const std::vector<Content> &contents) = 0;
     virtual std::vector<int> encode(const std::string &text) = 0;
     virtual std::string decode(const std::vector<int> &ids) = 0;
     virtual std::string decode(int id) = 0;
