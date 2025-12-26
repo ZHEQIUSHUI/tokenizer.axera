@@ -279,6 +279,13 @@ int main(int argc, char *argv[])
         fprintf(stderr, "load tokenizer failed");
         return -1;
     }
+    auto stop_tokens = tokenizer->get_stop_tokens();
+    printf("stop_tokens size: %ld\n{", stop_tokens.size());
+    for (auto id : stop_tokens)
+    {
+        printf("%d %s, ", id, tokenizer->decode(id).c_str());
+    }
+    printf("}\n");
 
     test_text_tokenizer(tokenizer);
     test_image_tokenizer(tokenizer);

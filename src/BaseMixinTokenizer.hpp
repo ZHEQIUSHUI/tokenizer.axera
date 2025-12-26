@@ -1,13 +1,13 @@
 #pragma once
 #include "BaseTokenizer.hpp"
 
-#include "tokenizer/tokenizer.hpp"
+#include "tokenizer/tokenizer_hf.hpp"
 
 template <ContentType... Types>
 class BaseMixinTokenizer : public BaseTokenizer
 {
 protected:
-    std::shared_ptr<MNN::Transformer::Tokenizer> tokenizer;
+    std::shared_ptr<Tokenizer> tokenizer;
     static constexpr ContentType support_types[] = {Types...};
 
     std::vector<int> addition_stop_tokens = {};
@@ -52,7 +52,7 @@ protected:
 public:
     bool load(const std::string tokenizer_path) override
     {
-        tokenizer.reset(MNN::Transformer::Tokenizer::createTokenizer(tokenizer_path));
+        tokenizer.reset(Tokenizer::createTokenizer(tokenizer_path));
         return tokenizer != nullptr;
     }
 
