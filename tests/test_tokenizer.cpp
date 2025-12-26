@@ -1,6 +1,8 @@
 #include "cmdline.hpp"
+#include "timer.hpp"
 #include "magic_enum.hpp"
 #include "../include/BaseTokenizer.hpp"
+#include <fstream>
 #include <iomanip>
 
 // ids1: {1,2,3}
@@ -27,11 +29,71 @@ std::vector<int> diff_token_ids(std::vector<int> ids1, std::vector<int> ids2)
 
 void test_text_tokenizer(std::shared_ptr<BaseTokenizer> tokenizer)
 {
+    std::string system_prompt = "You are Qwen, created by Alibaba Cloud. You are a helpful assistant";
+    std::ifstream system_prompt_file("system_prompt.md");
+    if (system_prompt_file.is_open())
+    {
+        std::string line;
+        while (std::getline(system_prompt_file, line))
+        {
+            system_prompt += line;
+        }
+        system_prompt_file.close();
+    }
     // 保留 thinking 内容
     {
         tokenizer->set_think_in_prompt(true);
         std::vector<Content> contents = {
-            {SYSTEM, TEXT, "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+            {SYSTEM, TEXT, system_prompt},
+            {USER, TEXT, "你好"},
+            {ASSISTANT, TEXT, "<think>\n\n</think>\n\n你好！有什么我可以帮助你的吗？"}};
+        timer t_cost;
+        t_cost.start();
+        auto chat_template = tokenizer->apply_chat_template(contents);
+        t_cost.stop();
+        printf("chat_template cost: %f ms\n", t_cost.cost());
+
+        t_cost.start();
+        std::vector<int> ids = tokenizer->encode(chat_template);
+        t_cost.stop();
+        printf("encode cost: %f ms\n", t_cost.cost());
+
+        printf("ids size: %ld\n{", ids.size());
+        for (auto id : ids)
+        {
+            printf("%d, ", id);
+        }
+        printf("}\n");
+
+        std::string text = tokenizer->decode(ids);
+        printf("text: \n%s\n", text.c_str());
+
+        contents.push_back({USER, TEXT, "你能做什么"});
+        auto ids2 = tokenizer->encode(contents);
+        printf("ids size: %ld\n{", ids2.size());
+        for (auto id : ids2)
+        {
+            printf("%d, ", id);
+        }
+        printf("}\n");
+
+        text = tokenizer->decode(ids2);
+        printf("text: \n%s\n", text.c_str());
+
+        auto diff_ids = diff_token_ids(ids, ids2);
+        printf("diff_ids size: %ld\n{", diff_ids.size());
+        for (auto id : diff_ids)
+        {
+            printf("%d, ", id);
+        }
+        printf("}\n");
+    }
+
+    // 不保留 thinking 内容
+    {
+        tokenizer->set_think_in_prompt(false);
+        std::vector<Content> contents = {
+            {SYSTEM, TEXT, system_prompt},
             {USER, TEXT, "你好"},
             {ASSISTANT, TEXT, "<think>\n\n</think>\n\n你好！有什么我可以帮助你的吗？"}};
 
@@ -71,47 +133,7 @@ void test_text_tokenizer(std::shared_ptr<BaseTokenizer> tokenizer)
     {
         tokenizer->set_think_in_prompt(false);
         std::vector<Content> contents = {
-            {SYSTEM, TEXT, "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
-            {USER, TEXT, "你好"},
-            {ASSISTANT, TEXT, "<think>\n\n</think>\n\n你好！有什么我可以帮助你的吗？"}};
-
-        std::vector<int> ids = tokenizer->encode(contents);
-        printf("ids size: %ld\n{", ids.size());
-        for (auto id : ids)
-        {
-            printf("%d, ", id);
-        }
-        printf("}\n");
-
-        std::string text = tokenizer->decode(ids);
-        printf("text: \n%s\n", text.c_str());
-
-        contents.push_back({USER, TEXT, "你能做什么"});
-        auto ids2 = tokenizer->encode(contents);
-        printf("ids size: %ld\n{", ids2.size());
-        for (auto id : ids2)
-        {
-            printf("%d, ", id);
-        }
-        printf("}\n");
-
-        text = tokenizer->decode(ids2);
-        printf("text: \n%s\n", text.c_str());
-
-        auto diff_ids = diff_token_ids(ids, ids2);
-        printf("diff_ids size: %ld\n{", diff_ids.size());
-        for (auto id : diff_ids)
-        {
-            printf("%d, ", id);
-        }
-        printf("}\n");
-    }
-
-    // 不保留 thinking 内容
-    {
-        tokenizer->set_think_in_prompt(false);
-        std::vector<Content> contents = {
-            {SYSTEM, TEXT, "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+            {SYSTEM, TEXT, system_prompt},
             {USER, TEXT, "你好"},
             {ASSISTANT, TEXT, "</think>\n\n你好！有什么我可以帮助你的吗？"}};
 
@@ -150,9 +172,20 @@ void test_text_tokenizer(std::shared_ptr<BaseTokenizer> tokenizer)
 
 void test_image_tokenizer(std::shared_ptr<BaseTokenizer> tokenizer)
 {
+    std::string system_prompt = "You are Qwen, created by Alibaba Cloud. You are a helpful assistant";
+    std::ifstream system_prompt_file("system_prompt.md");
+    if (system_prompt_file.is_open())
+    {
+        std::string line;
+        while (std::getline(system_prompt_file, line))
+        {
+            system_prompt += line;
+        }
+        system_prompt_file.close();
+    }
     {
         std::vector<Content> contents = {
-            {SYSTEM, TEXT, "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+            {SYSTEM, TEXT, system_prompt},
             {USER, TEXT, "你好"},
             {ASSISTANT, TEXT, "你好！有什么我可以帮助你的吗？"}};
 
@@ -183,7 +216,7 @@ void test_image_tokenizer(std::shared_ptr<BaseTokenizer> tokenizer)
 
     {
         std::vector<Content> contents = {
-            {SYSTEM, TEXT, "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+            {SYSTEM, TEXT, system_prompt},
             {USER, TEXT, "你好"},
             {ASSISTANT, TEXT, "你好！有什么我可以帮助你的吗？"}};
 
@@ -199,8 +232,11 @@ void test_image_tokenizer(std::shared_ptr<BaseTokenizer> tokenizer)
         printf("text: \n%s\n", text.c_str());
 
         contents.push_back({USER, VIDEO, "帮我看看这个视频", 8, 256});
-
+        timer t_cost;
+        t_cost.start();
         auto ids2 = tokenizer->encode(contents);
+        t_cost.stop();
+        printf("encode cost: %f ms\n", t_cost.cost());
         printf("ids size: %ld\n{", ids2.size());
         for (auto id : ids2)
         {
