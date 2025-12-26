@@ -3,16 +3,6 @@
 #include <vector>
 #include <memory>
 
-enum ModelType
-{
-    Qwen2_5,
-    Qwen3,
-    Qwen3VL,
-
-    InternVL3,
-
-    SmolVLM2,
-};
 
 enum RoleType
 {
@@ -70,4 +60,4 @@ public:
     virtual std::string decode(int id) = 0;
 };
 
-std::shared_ptr<BaseTokenizer> create_tokenizer(ModelType type);
+std::shared_ptr<BaseTokenizer> create_tokenizer(std::string model_dir);

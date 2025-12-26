@@ -251,29 +251,14 @@ void test_image_tokenizer(std::shared_ptr<BaseTokenizer> tokenizer)
 
 int main(int argc, char *argv[])
 {
-    std::stringstream model_type_str;
-    model_type_str << "model type: \033[32m";
-    for (auto name : magic_enum::enum_names<ModelType>())
-    {
-        model_type_str << std::setw(10) << name << " :" << magic_enum::enum_cast<ModelType>(name).value() << " ";
-    }
-    model_type_str << "\033[0m";
 
     std::string tokenizer_path = "../tests/assets/qwen3_tokenizer.txt";
     cmdline::parser a;
-    a.add<std::string>("tokenizer_path", 't', "tokenizer path", true);
-    a.add<int>("model_type", 'm', model_type_str.str(), true);
-
+    a.add<std::string>("dir", 'd', "hf tokenizer dir", true);
     a.parse_check(argc, argv);
-    tokenizer_path = a.get<std::string>("tokenizer_path");
-    auto model_type = magic_enum::enum_cast<ModelType>(a.get<int>("model_type"));
-    if (!model_type.has_value())
-    {
-        fprintf(stderr, "model type %d not found, please check model type in %s\n", a.get<int>("model_type"), model_type_str.str().c_str());
-        return -1;
-    }
+    tokenizer_path = a.get<std::string>("dir");
 
-    std::shared_ptr<BaseTokenizer> tokenizer = create_tokenizer((ModelType)model_type.value());
+    std::shared_ptr<BaseTokenizer> tokenizer = create_tokenizer(tokenizer_path);
     if (!tokenizer->load(tokenizer_path))
     {
         fprintf(stderr, "load tokenizer failed");
