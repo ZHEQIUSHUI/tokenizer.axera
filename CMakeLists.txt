@@ -9,6 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 project(tokenizer.axera)
+cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -43,12 +44,16 @@ endif()
 
 add_library(tokenizer SHARED src/BaseTokenizer.cpp src/tokenizer/tokenizer_hf.cpp)
 target_include_directories(tokenizer PRIVATE "${HF_TOKENIZER_INCLUDE_DIR}")
-target_link_libraries(tokenizer PRIVATE hf_tokenizer_ffi pthread dl)
+target_link_libraries(tokenizer PRIVATE hf_tokenizer_ffi pthread ${CMAKE_DL_LIBS})
 
 add_library(tokenizer_static STATIC src/BaseTokenizer.cpp src/tokenizer/tokenizer_hf.cpp)
 target_include_directories(tokenizer_static PRIVATE "${HF_TOKENIZER_INCLUDE_DIR}")
-target_link_libraries(tokenizer_static PRIVATE hf_tokenizer_ffi pthread dl)  # ✅ 你之前这里漏了
+target_link_libraries(tokenizer_static PRIVATE hf_tokenizer_ffi pthread ${CMAKE_DL_LIBS})
 
+if (WIN32)
+  target_link_libraries(tokenizer PRIVATE ws2_32 NtosKrnl Userenv ntdll)
+  target_link_libraries(tokenizer_static PRIVATE ws2_32 NtosKrnl Userenv ntdll)
+endif()
 
 function(add_test test_name)
     add_executable(${test_name} tests/${test_name}.cpp)
