@@ -9,13 +9,14 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 project(tokenizer.axera)
+cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(include)
 
-add_library(tokenizer src/BaseTokenizer.cpp src/tokenizer/tokenizer.cpp)
+add_library(tokenizer src/BaseTokenizer.cpp src/tokenizer/tokenizer_optimized.cpp)
 
 function(add_test test_name)
     add_executable(${test_name} tests/${test_name}.cpp)
