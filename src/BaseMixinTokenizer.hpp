@@ -1,7 +1,7 @@
 #pragma once
 #include "BaseTokenizer.hpp"
 
-#include "tokenizer/tokenizer.hpp"
+#include "tokenizer/tokenizer_optimized.hpp"
 
 template <ContentType... Types>
 class BaseMixinTokenizer : public BaseTokenizer
