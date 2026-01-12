@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "auto_chat_template" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "auto_chat_template" ]
   workflow_dispatch:
 
 # 需要写 release / tag 的权限
@@ -114,9 +114,9 @@ jobs:
           set -euo pipefail
           mkdir -p out
 
-          tar -C dist/build-x86 -czf out/sdk-linux-x86_64.tar.gz .
-          tar -C dist/build-aarch64 -czf out/sdk-linux-aarch64.tar.gz .
-          (cd dist/build-windows-mingw64 && zip -r ../../out/sdk-windows-mingw64.zip .)
+          tar -C dist/build-x86 -czf out/hf-auto-sdk-linux-x86_64.tar.gz .
+          tar -C dist/build-aarch64 -czf out/hf-auto-sdk-linux-aarch64.tar.gz .
+          (cd dist/build-windows-mingw64 && zip -r ../../out/hf-auto-sdk-windows-mingw64.zip .)
 
           ls -lah out
 
