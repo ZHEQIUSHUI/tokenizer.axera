@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "hf" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "hf" ]
   workflow_dispatch:
 
 # 需要写 release / tag 的权限
@@ -84,8 +84,6 @@ jobs:
     name: Publish SDKs to fixed Release tag
     runs-on: ubuntu-latest
     needs: [build-x86, build-aarch64, build-windows-mingw64]
-    # 只在 main push / 手动触发时发布；PR 不发布
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v4
 
@@ -114,9 +112,9 @@ jobs:
           set -euo pipefail
           mkdir -p out
 
-          tar -C dist/build-x86 -czf out/sdk-linux-x86_64.tar.gz .
-          tar -C dist/build-aarch64 -czf out/sdk-linux-aarch64.tar.gz .
-          (cd dist/build-windows-mingw64 && zip -r ../../out/sdk-windows-mingw64.zip .)
+          tar -C dist/build-x86 -czf out/hf-sdk-linux-x86_64.tar.gz .
+          tar -C dist/build-aarch64 -czf out/hf-sdk-linux-aarch64.tar.gz .
+          (cd dist/build-windows-mingw64 && zip -r ../../out/hf-sdk-windows-mingw64.zip .)
 
           ls -lah out
 
