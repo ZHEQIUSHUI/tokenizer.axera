@@ -84,8 +84,6 @@ jobs:
     name: Publish SDKs to fixed Release tag
     runs-on: ubuntu-latest
     needs: [build-x86, build-aarch64, build-windows-mingw64]
-    # 只在 main push / 手动触发时发布；PR 不发布
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v4
 
